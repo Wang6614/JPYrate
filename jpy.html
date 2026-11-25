@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中国银行 日元牌价</title>
+<style>
+  html,body { margin:0; height:100%; background:#000; }
+  body { font-family: sans-serif; color:#ddd; display:flex; align-items:center; justify-content:center; }
+  #wrap { text-align:center; transition: transform 2s ease; padding:16px; }
+  .label { font-size:18px; color:#778; letter-spacing:2px; }
+  .big { font-size:clamp(64px, 24vw, 130px); font-weight:bold; line-height:1.1; color:#e8e8e8; white-space:nowrap; }
+  .sub { font-size:clamp(19px, 6.5vw, 30px); color:#999; margin-top:12px; line-height:1.6; }
+  .rows { font-size:20px; color:#9db8a4; margin-top:28px; line-height:1.9; }
+  .meta { font-size:16px; color:#556; margin-top:26px; line-height:1.7; }
+</style></head><body>
+<div id="wrap">
+  <div class="label">中国银行 · 日元 现钞卖出价</div>
+  <div class="big" id="big">--</div>
+  <div class="sub" id="sub">人民币 / 100 日元</div>
+  <div class="rows" id="rows"></div>
+  <div class="meta" id="meta"></div>
+</div>
+<script>
+// 数据源: 先试本地 Termux 服务 (/boc.json), 连不上再试云端 Worker。
+// 部署 Cloudflare Worker 后, 把下面地址换成你的 workers.dev 地址即可。
+const CLOUD_BOC_JSON = "https://phone-connection.a18900982878.workers.dev/";
+async function fetchBoc(){
+  for (const u of ["/boc.json", CLOUD_BOC_JSON]) {
+    try {
+      const r = await fetch(u, {cache:"no-store"});
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (!d.error) return d;
+    } catch(e) { /* 换下一个源 */ }
+  }
+  return null;
+}
+async function load(){
+  try {
+    const d = await fetchBoc();
+    if (!d){ document.getElementById("big").textContent = "抓取失败"; return; }
+    document.getElementById("big").textContent = d.cash_sell.toFixed(4);
+    document.getElementById("sub").innerHTML =
+      "1 元人民币 ≈ " + (Math.round(100 / d.cash_sell * 1000) / 1000) + " 日元（按现钞卖出价）";
+    document.getElementById("rows").innerHTML =
+      "现汇买入 " + d.spot_buy.toFixed(4) + " · 现汇卖出 " + d.spot_sell.toFixed(4) + "<br>" +
+      "现钞买入 " + d.cash_buy.toFixed(4) + " · 中行折算价 " + d.boc_mid.toFixed(4);
+    document.getElementById("meta").textContent =
+      "中行发布 " + d.published_bj + "（北京时间）" + (d.stale ? " · 显示的是缓存" : "");
+  } catch(e) {
+    document.getElementById("big").textContent = "服务未连接";
+  }
+}
+load();
+setInterval(load, 300000);
+setInterval(()=>{
+  const x = Math.round(Math.random()*16-8), y = Math.round(Math.random()*16-8);
+  document.getElementById("wrap").style.transform = "translate("+x+"px,"+y+"px)";
+}, 60000);
+</script>
+</body></html>
