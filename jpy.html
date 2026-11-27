@@ -2,6 +2,10 @@
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>中国银行 日元牌价</title>
+<link rel="icon" href="fx-rate.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="fx-rate.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
 <style>
   html,body { margin:0; height:100%; background:#000; }
   body { font-family: sans-serif; color:#ddd; display:flex; align-items:center; justify-content:center; }
@@ -11,9 +15,12 @@
   .sub { font-size:clamp(19px, 6.5vw, 30px); color:#999; margin-top:12px; line-height:1.6; }
   .rows { font-size:20px; color:#9db8a4; margin-top:28px; line-height:1.9; }
   .meta { font-size:16px; color:#556; margin-top:26px; line-height:1.7; }
+  .fx-img { width:110px; height:110px; object-fit:contain; margin-top:10px; animation:fxfloat 3.2s ease-in-out infinite; }
+  @keyframes fxfloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
 </style></head><body>
 <div id="wrap">
   <div class="label">中国银行 · 日元 现钞卖出价</div>
+  <img class="fx-img" src="fx-rate.svg" alt="">
   <div class="big" id="big">--</div>
   <div class="sub" id="sub">人民币 / 100 日元</div>
   <div class="rows" id="rows"></div>
